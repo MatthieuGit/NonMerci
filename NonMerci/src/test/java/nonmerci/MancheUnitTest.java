@@ -33,17 +33,14 @@ public class MancheUnitTest {
     @Mock
     private JoueurOrdi joueur1;
     @Mock
-    private JoueurHumain joueurHumain;
+    private JoueurOrdi joueur2;
     @Mock
-    private CarteMisee carteAprendre;
+    private JoueurHumain joueurHumain;
 
     @Before
     public void setUp(){
         partie = mock(Partie.class);
         gameControler = mock(GameControler.class);
-        joueur1 = mock(JoueurOrdi.class);
-        joueurHumain = mock(JoueurHumain.class);
-
     }
 
     @Test
@@ -51,14 +48,12 @@ public class MancheUnitTest {
         //DEFINE
         pioche = new JeuDeCarte(4);
         manche = new Manche(partie, pioche);
-
         //WHEN
         when(partie.getJoueurActif()).thenReturn(joueur1);
         when(partie.choixJoueurAuHazard()).thenReturn(joueur1);
         when(partie.getGameControler()).thenReturn(gameControler);
         when(joueur1.veutOuDoitRecupererCarte(ArgumentMatchers.<CarteMisee>any(CarteMisee.class), any(GameControler.class))).thenReturn(true);
         manche.jouer();
-
         //THEN
         verify(gameControler, times(2)).refreshBoard(partie.getJoueurActif());
     }
@@ -68,11 +63,9 @@ public class MancheUnitTest {
         //DEFINE
         pioche = new JeuDeCarte(3);
         manche = new Manche(partie, pioche);
-
         //when
         when(partie.getGameControler()).thenReturn(gameControler);
         manche.jouer();
-
         //THEN
         verify(gameControler, times(1)).refreshBoard(partie.getJoueurActif());
     }
@@ -80,14 +73,23 @@ public class MancheUnitTest {
     @Test
     public void testWhenCarteAprendreIsNull() {
         //DEFINE
-        pioche = new JeuDeCarte(4);
-        manche = new Manche(partie, pioche);
+        Partie nPartie = new Partie();
+        pioche = new JeuDeCarte(5);
+        nPartie.addJoueur(new JoueurOrdi("hal", 3));
+        nPartie.addJoueur(new JoueurOrdi("jarvis", 3));
+        nPartie.addJoueur(new JoueurOrdi("test", 3));
+        nPartie.addJoueur(new JoueurOrdi("test2", 3));
 
-        //WHEN
-        when(partie.getGameControler()).thenReturn(gameControler);
+        TextControler gc = new TextControler(nPartie);
+        nPartie.setGameControler(gc);
+        manche = new Manche(nPartie, pioche);
+        nPartie.setManche(manche);
+
         manche.jouer();
 
         //THEN
+        Assert.assertTrue(manche.piocheVide());
+
     }
 
 
